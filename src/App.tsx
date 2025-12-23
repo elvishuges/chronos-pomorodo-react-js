@@ -3,7 +3,7 @@ import { Home } from "./pages/Home";
 import "./styles/theme.css";
 import "./styles/global.css";
 import { useState } from "react";
-import { TaskStateModel } from "./models/TaskStateModel";
+import type { TaskStateModel } from "./models/TaskStateModel";
 import { TaskContextProvider } from "./contexts/TaskContext";
 
 const initialState: TaskStateModel = {

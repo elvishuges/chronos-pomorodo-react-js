@@ -3,25 +3,13 @@ import { Home } from "./pages/Home";
 import "./styles/theme.css";
 import "./styles/global.css";
 import { useState } from "react";
-import type { TaskStateModel } from "./models/TaskStateModel";
-
-// export type TaskStateModel = {
-//   tasks: TaskModel[];
-//   secondsRemaining: number;
-//   formattedSecondsRemaining: string;
-//   activeTask: TaskModel | null;
-//   currentCycle: number; // 1 a 8
-//   config: {
-//     workTime: number;
-//     shortBreakTime: number;
-//     longBreakTime: number;
-//   };
-// };
+import { TaskStateModel } from "./models/TaskStateModel";
+import { TaskContextProvider } from "./contexts/TaskContext";
 
 const initialState: TaskStateModel = {
   tasks: [],
   secondsRemaining: 0,
-  formattedSecondsRemaining: "10:00",
+  formattedSecondsRemaining: "00:00",
   activeTask: null,
   currentCycle: 0,
   config: {
@@ -34,5 +22,9 @@ const initialState: TaskStateModel = {
 export function App() {
   const [state, setState] = useState(initialState);
 
-  return <Home state={state} setState={setState} />;
+  return (
+    <TaskContextProvider>
+      <Home />
+    </TaskContextProvider>
+  );
 }

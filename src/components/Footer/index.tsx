@@ -6,7 +6,7 @@ export function Footer() {
       <a href="">Entenda como funciona a técnica pomodoro</a>
       <a href="">
         Chronos Pomodoro &copy; {new Date().getFullYear()} - Feito com 💚 Por
-        Elvis Huges
+        Elvis Huges - v1.2
       </a>
     </footer>
   );

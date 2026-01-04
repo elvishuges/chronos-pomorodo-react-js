@@ -28,8 +28,8 @@ export function MainForm() {
     const taskName = taskNameInput.current.value.trim();
 
     if (!taskName) {
-      showMessage.warn("Digite o nome da tarefa");
-      return;
+      showMessage.success("Digite o nome da tarefa");
+      return; //
     }
 
     const newTask: TaskModel = {

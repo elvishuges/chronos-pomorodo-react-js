@@ -13,6 +13,7 @@ type AvailableThemes = "dark" | "light";
 
 export function Menu() {
   const [theme, setTheme] = useState<AvailableThemes>(() => {
+    // lazy loader
     const storageTheme =
       (localStorage.getItem("theme") as AvailableThemes) || "dark";
     return storageTheme;

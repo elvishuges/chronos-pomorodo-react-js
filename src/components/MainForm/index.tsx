@@ -14,8 +14,10 @@ import type { TaskModel } from "../../models/TaskModel";
 export function MainForm() {
   const { state, dispatch } = useTaskContext();
   const taskNameInput = useRef<HTMLInputElement>(null);
+  const lastTaskname = state.tasks.length
+    ? state.tasks[state.tasks.length - 1].name
+    : "";
 
-  // ciclos
   const nextCycle = getNextCycle(state.currentCycle);
   const nextCyleType = getNextCycleType(nextCycle);
 
@@ -63,6 +65,7 @@ export function MainForm() {
           placeholder="Digite algo"
           ref={taskNameInput}
           disabled={!!state.activeTask}
+          defaultValue={lastTaskname}
         />
       </div>
 

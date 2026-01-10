@@ -8,13 +8,16 @@ import styles from "./styles.module.css";
 import { useTaskContext } from "../../contexts/TaskContext/useTaskContext";
 import { formatDate } from "../../utils/formatDate";
 import { getTaskStatus } from "../../utils/getTaskStatus";
-import { sortTasks, type SortTasksOptions } from "../../utils/sortTasks";
 import { useEffect, useState } from "react";
+import { showMessage } from "../../adapters/showMessage";
 import { TaskActionTypes } from "../../contexts/TaskContext/taskActions";
+import { sortTasks, type SortTasksOptions } from "../../utils/sortTasks";
 
 export function History() {
   const { state, dispatch } = useTaskContext();
+  const [confirmClearHistory, setConfirmClearHistory] = useState(false);
   const tableHasItens = state.tasks.length > 0;
+
   const [sortTasksOptions, setSortTaskOptions] = useState<SortTasksOptions>(
     () => {
       return {
@@ -36,6 +39,14 @@ export function History() {
     }));
   }, [state.tasks]);
 
+  useEffect(() => {
+    if (!confirmClearHistory) return;
+
+    setConfirmClearHistory(false);
+
+    dispatch({ type: TaskActionTypes.RESET_STATE });
+  }, [confirmClearHistory, dispatch]);
+
   function handleSortTasks({ field }: Pick<SortTasksOptions, "field">) {
     const newDirection = sortTasksOptions.direction === "desc" ? "asc" : "desc";
 
@@ -49,9 +60,12 @@ export function History() {
       field,
     });
   }
+
   function handleResetHistory() {
-    if (!confirm("Apagar Tasks?")) return;
-    dispatch({ type: TaskActionTypes.RESET_STATE });
+    showMessage.dismiss();
+    showMessage.confirm("Tem certeza?", (confirmation) => {
+      setConfirmClearHistory(confirmation);
+    });
   }
 
   return (
@@ -59,73 +73,77 @@ export function History() {
       <Container>
         <Heading>
           <span>History</span>
-          <span className={styles.buttonContainer}>
-            <DefaultButton
-              disabled={!tableHasItens}
-              icon={<TrashIcon />}
-              color="red"
-              aria-label="Apagar todo o histórico"
-              title="Apagar histórico"
-              onClick={handleResetHistory}
-            />
-          </span>
+          {tableHasItens && (
+            <span className={styles.buttonContainer}>
+              <DefaultButton
+                icon={<TrashIcon />}
+                color="red"
+                aria-label="Apagar todo o histórico"
+                title="Apagar histórico"
+                onClick={handleResetHistory}
+              />
+            </span>
+          )}
         </Heading>
       </Container>
 
       <Container>
-        <div className={styles.responsiveTable}>
-          <table>
-            <thead>
-              <tr>
-                <th
-                  onClick={() => handleSortTasks({ field: "name" })}
-                  className={styles.thSort}
-                >
-                  Tarefa ↕
-                </th>
-                <th
-                  onClick={() => handleSortTasks({ field: "duration" })}
-                  className={styles.thSort}
-                >
-                  Duração ↕
-                </th>
-                <th
-                  onClick={() => handleSortTasks({ field: "startDate" })}
-                  className={styles.thSort}
-                >
-                  Data ↕
-                </th>
-                <th>Status</th>
-                <th>Tipo</th>
-              </tr>
-            </thead>
+        {tableHasItens && (
+          <div className={styles.responsiveTable}>
+            <table>
+              <thead>
+                <tr>
+                  <th
+                    onClick={() => handleSortTasks({ field: "name" })}
+                    className={styles.thSort}
+                  >
+                    Tarefa ↕
+                  </th>
+                  <th
+                    onClick={() => handleSortTasks({ field: "duration" })}
+                    className={styles.thSort}
+                  >
+                    Duração ↕
+                  </th>
+                  <th
+                    onClick={() => handleSortTasks({ field: "startDate" })}
+                    className={styles.thSort}
+                  >
+                    Data ↕
+                  </th>
+                  <th>Status</th>
+                  <th>Tipo</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {sortTasksOptions.tasks.map((task) => {
-                const taskTypeDictionary = {
-                  workTime: "Foco",
-                  shortBreakTime: "Descanso curto",
-                  longBreakTime: "Descanso longo",
-                };
+              <tbody>
+                {sortTasksOptions.tasks.map((task) => {
+                  const taskTypeDictionary = {
+                    workTime: "Foco",
+                    shortBreakTime: "Descanso curto",
+                    longBreakTime: "Descanso longo",
+                  };
 
-                return (
-                  <tr key={task.id}>
-                    <td>{task.name}</td>
-                    <td>{task.duration}min</td>
-                    <td>{formatDate(task.startDate)}</td>
-                    <td>{getTaskStatus(task, state.activeTask)}</td>
-                    <td>{taskTypeDictionary[task.type]}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {!tableHasItens && (
-            <div style={{ textAlign: "center", fontSize: 17, paddingTop: 10 }}>
-              Não Há Itens!
-            </div>
-          )}
-        </div>
+                  return (
+                    <tr key={task.id}>
+                      <td>{task.name}</td>
+                      <td>{task.duration}min</td>
+                      <td>{formatDate(task.startDate)}</td>
+                      <td>{getTaskStatus(task, state.activeTask)}</td>
+                      <td>{taskTypeDictionary[task.type]}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {!tableHasItens && (
+          <div style={{ textAlign: "center", fontSize: 17, paddingTop: 10 }}>
+            Não há Itens!
+          </div>
+        )}
       </Container>
     </MainTemplate>
   );
